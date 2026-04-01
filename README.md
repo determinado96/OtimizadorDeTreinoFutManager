@@ -1,2 +1,3 @@
 # OtimizadorDeTreinoFutManager
-Otimizador de treino para jogadoresd do FutManager.
+
+Otimizador de treino para jogadores do futmanager.
