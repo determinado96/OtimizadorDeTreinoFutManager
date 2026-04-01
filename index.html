@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Otimização de Treino - OVR Perfeito</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #0f172a;
+      margin: 0;
+      padding: 20px;
+      color: #e2e8f0;
+    }
+
+    .container {
+      background: #111827;
+      border: 1px solid #293249;
+      padding: 28px;
+      border-radius: 16px;
+      width: 560px;
+      max-width: 100%;
+      margin: 20px auto;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    h2 {
+      margin-bottom: 24px;
+      color: #f8fafc;
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      font-size: 1.8rem;
+    }
+
+    label {
+      font-size: 12px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      font-size: 14px;
+      color: #f8fafc;
+    }
+
+    input,
+    select {
+      background: #0f172a;
+      padding: 12px;
+      margin-bottom: 4px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+    }
+
+    button {
+      background: #2563eb;
+      padding: 14px;
+      margin-top: 14px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    @media (min-width: 720px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .full-width {
+        grid-column: 1 / -1;
+      }
+    }
+
+    .result {
+      margin-top: 24px;
+    }
+
+    .card {
+      background: #0b1120;
+      border: 1px solid #1e293b;
+      padding: 18px;
+      border-radius: 12px;
+      margin-top: 12px;
+    }
+
+    .explicacao {
+      margin-bottom: 18px;
+    }
+
+    #conteudoExplicacao {
+      padding: 12px;
+      background: rgba(148, 163, 184, 0.08);
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    /* Modal corrigido */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #0b1120;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 18px;
+      min-width: 280px;
+      max-width: 90%;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+    }
+
+    .close {
+      background: #ef4444;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      padding: 8px 14px;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    .bar {
+      height: 8px;
+      background: #334155;
+      border-radius: 4px;
+      margin: 4px 0 12px;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      background: #2563eb;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>⚽ Otimização de Treino</h2>
+
+    <div class="form-grid">
+      <div class="field full-width">
+        <label>Nome do Jogador</label>
+        <input type="text" id="nome" />
+      </div>
+
+      <div class="field half">
+        <label>Tipo</label>
+        <select id="tipo">
+          <option value="linha">Jogador de Linha</option>
+          <option value="goleiro">Goleiro</option>
+        </select>
+      </div>
+
+      <div class="field half">
+        <label>Atributo Principal</label>
+        <input type="number" id="principal" />
+      </div>
+
+      <div class="field half">
+        <label>Atributo Secundário</label>
+        <input type="number" id="secundario" />
+      </div>
+
+      <div class="field half" id="grupoTerciario">
+        <label>Atributo Terciário</label>
+        <input type="number" id="terciario" />
+      </div>
+
+      <div class="field full-width">
+        <label>OVR Máximo Desejado</label>
+        <input type="number" id="ovrMax" />
+      </div>
+    </div>
+
+    <button id="calcular">Calcular Build Perfeita</button>
+
+    <div class="result" id="resultado"></div>
+
+    <div class="explicacao">
+      <button id="toggleExplicacao">Ocultar explicação</button>
+
+      <div id="conteudoExplicacao">
+        <b>Como o sistema calcula a build perfeita?</b><br /><br />
+
+        <b>1. Como funciona o OVR</b><br />
+        Cada atributo tem um peso diferente no OVR.<br /><br />
+
+        <b>Jogador de Linha:</b><br />
+        Principal vale 60% do OVR<br />
+        Secundário vale 30% do OVR<br />
+        Terciário vale 10% do OVR<br /><br />
+
+        Exemplo:<br />
+        Se você aumentar:<br />
+        +1 Principal → +0.6 no OVR<br />
+        +1 Secundário → +0.3 no OVR<br />
+        +1 Terciário → +0.1 no OVR<br /><br />
+
+        Ou seja:<br />
+        O Principal sobe o OVR muito rápido.<br />
+        O Terciário sobe o OVR bem devagar.<br /><br />
+
+        <b>2. Qual o problema de treinar errado?</b><br />
+        Se você treinar só o Principal, o OVR sobe muito rápido e você atinge
+        o limite sem conseguir aumentar muito os outros atributos.<br /><br />
+
+        Então a estratégia correta é treinar mais o Secundário e
+        principalmente o Terciário, porque eles aumentam o OVR mais devagar e
+        permitem que o jogador fique com mais atributos no total antes de
+        atingir o OVR máximo.<br /><br />
+
+        <b>3. O que o sistema faz?</b><br />
+        O sistema calcula exatamente quantos pontos faltam para chegar no OVR
+        desejado e testa várias combinações de treino até encontrar a
+        combinação onde:<br />
+        - O OVR fica exatamente no valor desejado<br />
+        - A soma dos atributos é a maior possível<br /><br />
+
+        Ou seja, ele encontra a build que deixa o jogador o mais forte
+        possível sem passar do OVR.<br /><br />
+
+        <b>4. Para Goleiro</b><br />
+        Goleiro só usa dois atributos:<br />
+        Principal vale 90% do OVR<br />
+        Secundário vale 10% do OVR<br /><br />
+
+        Exemplo:<br />
+        +1 Principal → +0.9 no OVR<br />
+        +1 Secundário → +0.1 no OVR<br /><br />
+
+        Então para goleiro é ainda mais importante treinar o Secundário,
+        porque o Principal sobe o OVR muito rápido.<br /><br />
+
+        <b>Resumo:</b><br />
+        - Principal aumenta muito o OVR<br />
+        - Secundário aumenta médio<br />
+        - Terciário aumenta pouco<br />
+        - O sistema distribui os treinos para maximizar os atributos sem
+        estourar o OVR
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modalErro">
+    <div class="modal-content">
+      <h3>Erro</h3>
+      <p id="mensagemErro"></p>
+      <button class="close" onclick="fecharModal()">Fechar</button>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+    function mostrarErro(msg) {
+      $("#mensagemErro").text(msg);
+      $("#modalErro").addClass("show");
+    }
+
+    function fecharModal() {
+      $("#modalErro").removeClass("show");
+    }
+
+    $(document).ready(function () {
+      $("#tipo").change(function () {
+        if ($(this).val() == "goleiro") {
+          $("#grupoTerciario").hide();
+        } else {
+          $("#grupoTerciario").show();
+        }
+      });
+
+      $("#tipo").change();
+
+      $("#conteudoExplicacao").hide();
+      $("#toggleExplicacao").text("Mostrar explicação");
+
+      $("#toggleExplicacao").click(function () {
+        $("#conteudoExplicacao").slideToggle(300);
+
+        if ($(this).text() == "Ocultar explicação") {
+          $(this).text("Mostrar explicação");
+        } else {
+          $(this).text("Ocultar explicação");
+        }
+      });
+
+      $("#modalErro").click(function (e) {
+        if (e.target.id == "modalErro") fecharModal();
+      });
+    });
+
+    $("#calcular").click(function () {
+      try {
+        let nome = $("#nome").val();
+        let tipo = $("#tipo").val();
+
+        let A0 = parseInt($("#principal").val());
+        let B0 = parseInt($("#secundario").val());
+        let C0 = parseInt($("#terciario").val()) || 0;
+
+        let ovrMax = parseInt($("#ovrMax").val());
+
+        if (!nome) throw "Digite o nome do jogador";
+        if (isNaN(A0) || isNaN(B0))
+          throw "Preencha os atributos corretamente";
+        if (isNaN(ovrMax)) throw "Informe o OVR desejado";
+
+        let melhor = null;
+
+        if (tipo == "linha") {
+          let alvo = ovrMax * 10;
+          let atual = 6 * A0 + 3 * B0 + C0;
+          let falta = alvo - atual;
+
+          if (falta < 0) throw "Jogador já ultrapassou o OVR desejado";
+
+          for (let a = 0; a <= 50; a++) {
+            for (let b = 0; b <= 50; b++) {
+              for (let c = 0; c <= 50; c++) {
+                if (6 * a + 3 * b + c == falta) {
+                  let A = A0 + a;
+                  let B = B0 + b;
+                  let C = C0 + c;
+
+                  let soma = A + B + C;
+
+                  if (melhor == null || soma > melhor.soma) {
+                    melhor = {
+                      A,
+                      B,
+                      C,
+                      treinoA: a,
+                      treinoB: b,
+                      treinoC: c,
+                      soma,
+                    };
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          let alvo = ovrMax * 10;
+          let atual = 9 * A0 + B0;
+          let falta = alvo - atual;
+
+          if (falta < 0) throw "Goleiro já ultrapassou o OVR desejado";
+
+          for (let a = 0; a <= 50; a++) {
+            for (let b = 0; b <= 50; b++) {
+              if (9 * a + b == falta) {
+                let A = A0 + a;
+                let B = B0 + b;
+                let soma = A + B;
+
+                if (melhor == null || soma > melhor.soma) {
+                  melhor = { A, B, treinoA: a, treinoB: b, soma };
+                }
+              }
+            }
+          }
+        }
+
+        if (!melhor) throw "Nenhuma combinação exata encontrada";
+
+        function getPrioridade(valor) {
+          let cor;
+          let prioridade;
+
+          if (valor <= 40) {
+            cor = '#ef4444'; // vermelho
+            prioridade = 'Alta';
+          } else if (valor <= 80) {
+            cor = '#f59e0b'; // laranja
+            prioridade = 'Média';
+          } else {
+            cor = '#22c55e'; // verde
+            prioridade = 'Baixa';
+          }
+
+          return { prioridade, cor };
+        }
+
+        const priorA = getPrioridade(melhor.A);
+        const priorB = getPrioridade(melhor.B);
+        const priorC = tipo == 'linha' ? getPrioridade(melhor.C) : null;
+
+        $("#resultado").html(`
+            <div class="card">
+                <h3>${nome} - OVR ${ovrMax}</h3>
+
+                Principal: ${melhor.A} <span style="color:${priorA.cor}; font-weight:700;">[${priorA.prioridade}]</span>
+
+                Secundário: ${melhor.B} <span style="color:${priorB.cor}; font-weight:700;">[${priorB.prioridade}]</span>
+
+                ${tipo == "linha"
+            ? `
+                Terciário: ${melhor.C} <span style="color:${priorC.cor}; font-weight:700;">[${priorC.prioridade}]</span>
+                `
+            : ""
+          }
+
+                <hr>
+
+                <b>Treinos Necessários</b><br>
+                Principal: +${melhor.treinoA}<br>
+                Secundário: +${melhor.treinoB}<br>
+                ${tipo == "linha" ? `Terciário: +${melhor.treinoC}<br>` : ""}
+
+                <br>
+                <b>Soma dos Atributos:</b> ${melhor.soma}
+            </div>
+        `);
+      } catch (erro) {
+        mostrarErro(erro);
+      }
+    });
+  </script>
+</body>
+
+</html>
